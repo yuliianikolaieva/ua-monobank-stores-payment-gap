@@ -47,6 +47,11 @@
     .checklist li::before{content:"☐";position:absolute;left:0;color:var(--green);font-weight:700}
     footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
     code{font-size:12px;background:#eef2ef;padding:2px 6px;border-radius:4px}
+    pre.flow{background:#0f1a16;color:#d6e4dc;border-radius:10px;padding:14px 16px;font-size:12px;line-height:1.45;overflow:auto;margin:12px 0}
+    .card.red{border-color:#e8b4b4;background:var(--red-soft)}
+    .card.red p,.card.red li{color:#5c2a2a}
+    nav.toc{font-size:13px;margin:12px 0 20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+    nav.toc a{margin-right:12px}
     [data-lang]{display:none !important}
     body.lang-en [data-lang="en"],body.lang-uk [data-lang="uk"]{display:block !important}
     body.lang-en table[data-lang="en"],body.lang-uk table[data-lang="uk"]{display:table !important}
@@ -54,7 +59,7 @@
     @media print{.lang{display:none}.wrap{max-width:none}}
   </style>
 </head>
-<body class="lang-en">
+<body class="lang-uk">
 
 <div class="wrap">
   <div class="topbar">
@@ -63,31 +68,128 @@
       <div class="eyebrow" data-lang="uk">Bolt Food · Україна · Платежі</div>
       <h1 data-lang="en">Monobank &amp; charging the final basket after picking</h1>
       <h1 data-lang="uk">Monobank і фінальне списання після збірки</h1>
-      <p class="meta" data-lang="en"><strong>Status:</strong> internal working doc · Payments, Product, Monobank · <strong>Updated:</strong> 16 Sep 2026 · Yuliia Nikolaieva</p>
-      <p class="meta" data-lang="uk"><strong>Статус:</strong> internal working doc · Payments, Product, Monobank · <strong>Оновлено:</strong> 16 Sep 2026 · Yuliia Nikolaieva</p>
+      <p class="meta" data-lang="en"><strong>Status:</strong> internal explainer · Payments, Product, Monobank · <strong>Updated:</strong> 17 Sep 2026 · Yuliia Nikolaieva</p>
+      <p class="meta" data-lang="uk"><strong>Статус:</strong> internal explainer · Payments, Product, Monobank · <strong>Оновлено:</strong> 17 Sep 2026 · Yuliia Nikolaieva</p>
     </header>
     <div class="lang" role="group" aria-label="Language">
-      <button id="enBtn" class="active" type="button" onclick="setLanguage('en')">EN</button>
-      <button id="ukBtn" type="button" onclick="setLanguage('uk')">UA</button>
+      <button id="enBtn" type="button" onclick="setLanguage('en')">EN</button>
+      <button id="ukBtn" class="active" type="button" onclick="setLanguage('uk')">UA</button>
     </div>
   </div>
 
   <div class="hero">
-    <p data-lang="en">Goal: explain what we need, what Monobank does and does not support for a scaled Stores MVP, why we cannot simply copy Bolt Ride Hailing today — and list open questions (Glovo, Raiffeisen Aval, RH rails).</p>
-    <p data-lang="uk">Мета: пояснити, що нам потрібно, що Monobank підтримує й обмежує для масштабного Stores MVP, чому ми не можемо просто скопіювати Bolt Ride Hailing сьогодні — і зафіксувати відкриті питання (Glovo, Райффайзен Аваль, RH rails).</p>
+    <p data-lang="en">Plain-language guide to the <a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509" style="color:#b8e6cc">Slack thread</a>: why UA Stores cannot yet charge the final basket like Ride Hailing, what Monobank actually allows, and how that relates to Glovo’s “€100 then €120” pattern.</p>
+    <p data-lang="uk">Простою мовою про <a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509" style="color:#b8e6cc">тред у Slack</a>: чому UA Stores поки не може списати фінальний кошик як Ride Hailing, що Monobank реально дозволяє, і як це пов’язано з «100 € → 120 €» у Glovo.</p>
   </div>
 
-  <h2 data-lang="en">Related links</h2>
+  <nav class="toc" data-lang="en">
+    <a href="#slack">Slack context</a>
+    <a href="#understand">What to understand</a>
+    <a href="#three-q">Your 3 questions</a>
+    <a href="#mono-api">Monobank API</a>
+    <a href="#rh">vs Ride Hailing</a>
+  </nav>
+  <nav class="toc" data-lang="uk">
+    <a href="#slack">Контекст Slack</a>
+    <a href="#understand">Що зрозуміти</a>
+    <a href="#three-q">Твої 3 питання</a>
+    <a href="#mono-api">API Monobank</a>
+    <a href="#rh">vs Ride Hailing</a>
+  </nav>
+
+  <h2 id="slack" data-lang="en">0 · What the Slack thread is about</h2>
+  <h2 id="slack" data-lang="uk">0 · Про що тред у Slack</h2>
+  <p data-lang="en">Thread: <a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509">C0BD2EQR4LW</a> (Bolt enterprise). Topic: <strong>second payment / final charge after picking</strong> for UA grocery Stores, on the background of the <strong>Monobank agency + split</strong> scheme (LIKI24 / BOND pilots — see internal <code>bolt-mono-flow</code>).</p>
+  <p data-lang="uk">Тред: <a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509">C0BD2EQR4LW</a> (Bolt enterprise). Тема: <strong>друга транзакція / фінальне списання після збірки</strong> для UA grocery Stores на фоні схеми <strong>Monobank agency + split</strong> (пілоти LIKI24 / BOND — див. internal <code>bolt-mono-flow</code>).</p>
+  <div class="card">
+    <p data-lang="en"><strong>Business pain:</strong> eater pays <strong>X</strong> at checkout; after picking the partner act is <strong>Y</strong> (weight, replacements, bags). Bolt settles Y−X today. You need a compliant flow like rides: <em>estimate → hold → final basket → consent → charge Y</em> — not silent Glovo upcharge (Legal: <a href="https://taxify.atlassian.net/servicedesk/customer/portal/47/LSS-64024">LSS-64024</a>).</p>
+    <p data-lang="uk"><strong>Бізнес-біль:</strong> eater платить <strong>X</strong> на checkout; після збірки акт <strong>Y</strong> (вага, заміни, пакети). Bolt закриває Y−X. Потрібен комплаентний флоу як у rides: <em>estimate → hold → фінальний кошик → consent → списання Y</em> — не silent upcharge Glovo (Legal: <a href="https://taxify.atlassian.net/servicedesk/customer/portal/47/LSS-64024">LSS-64024</a>).</p>
+  </div>
+  <div class="callout warn">
+    <p data-lang="en"><strong>How to read Payments’ answer in Slack:</strong> they usually separate three layers — (1) what <strong>Monobank’s API</strong> allows, (2) what <strong>Bolt’s Monobank agency integration</strong> is built for today (pharmacy / BOND scale), (3) what <strong>Bolt Stores product</strong> can orchestrate. “Monobank doesn’t support it” in chat almost always means <strong>we cannot turn on RH-style final charge for all grocery tomorrow</strong>, not that the bank has zero two-phase payments.</p>
+    <p data-lang="uk"><strong>Як читати відповідь Payments у Slack:</strong> зазвичай розділяють три шари — (1) що дозволяє <strong>API Monobank</strong>, (2) для чого зроблена <strong>інтеграція Bolt × Monobank agency</strong> сьогодні (масштаб pharmacy / BOND), (3) що вміє оркеструвати <strong>продукт Bolt Stores</strong>. Фраза «Monobank не підтримує» у чаті майже завжди означає: <strong>ми не можемо увімкнути фінальне списання як у RH для всього grocery завтра</strong>, а не те, що в банку взагалі немає двофазної оплати.</p>
+  </div>
+
+  <h2 id="understand" data-lang="en">0.1 · What you should take away (one page)</h2>
+  <h2 id="understand" data-lang="uk">0.1 · Що варто винести (одна сторінка)</h2>
+  <ol>
+    <li data-lang="en"><strong>Monobank can do “hold then settle”</strong> — hold up to 9 days, <code>finalize</code> same or lower amount, or <code>cancel</code> + new charge via saved token (<a href="https://monobank.ua/api-docs/acquiring/extras/tokens/post--api--merchant--wallet--payment">wallet/payment</a>, <code>initiationKind=merchant</code> for MIT). See Bolt internal scenarios in <code>bolt-mono-flow</code>.</li>
+    <li data-lang="uk"><strong>Monobank вміє «hold → settle»</strong> — hold до 9 днів, <code>finalize</code> на ту саму або меншу суму, або <code>cancel</code> + нове списання по збереженому токену (<a href="https://monobank.ua/api-docs/acquiring/extras/tokens/post--api--merchant--wallet--payment">wallet/payment</a>, <code>initiationKind=merchant</code> для MIT). Сценарії Bolt — у <code>bolt-mono-flow</code>.</li>
+    <li data-lang="en"><strong>Monobank does not offer (in our integration) “add €20 on the same hold”</strong> like some global acquirers (incremental authorization). If <strong>Y &gt; hold</strong>, the documented path is: <strong>cancel the whole hold → charge full Y again</strong> (customer may see release + new debit — similar to Glovo’s €100 / €120 on the statement).</li>
+    <li data-lang="uk"><strong>Monobank не дає (у нашій схемі) «дописати €20 на той самий hold»</strong>, як деякі глобальні еквайєри (incremental authorization). Якщо <strong>Y &gt; hold</strong>, задокументований шлях: <strong>повний cancel hold → знову списати всю Y</strong> (на виписці може бути release + нове списання — схоже на €100 / €120 у Glovo).</li>
+    <li data-lang="en"><strong>Agency split</strong> works for a known <code>splitReceiverId</code> per sub-merchant (LIKI24, each BOND restaurant). <strong>Thousands of grocery stores</strong> = new scale of onboarding, split on the <em>second</em> charge, and ops — this is what blocks “just use Monobank like RH”.</li>
+    <li data-lang="uk"><strong>Agency split</strong> працює з відомим <code>splitReceiverId</code> на sub-merchant (LIKI24, кожен ресторан BOND). <strong>Тисячі grocery-магазинів</strong> = інший масштаб онбордингу, split на <em>другому</em> списанні та ops — це головний блокер «просто взяти Monobank як RH».</li>
+    <li data-lang="en"><strong>Bolt Ride Hailing</strong> uses a <strong>different payment stack and product flow</strong> (estimate/final is native). UA Stores checkout is still <strong>single capture before pick</strong>; second payment is a <strong>product investment</strong>, not a config toggle (<a href="https://yuliianikolaieva.github.io/ukraine-second-payment-business-case/">business case</a>).</li>
+    <li data-lang="uk"><strong>Bolt Ride Hailing</strong> — <strong>інший payment stack і продукт</strong> (estimate/final уже в продукті). UA Stores — <strong>одне списання до збірки</strong>; друга транзакція — <strong>інвестиція в продукт</strong>, не перемикач у конфігу (<a href="https://yuliianikolaieva.github.io/ukraine-second-payment-business-case/">business case</a>).</li>
+  </ol>
+
+  <h2 id="three-q" data-lang="en">0.2 · Your three questions — short answers</h2>
+  <h2 id="three-q" data-lang="uk">0.2 · Твої три питання — короткі відповіді</h2>
+
+  <h3 data-lang="en">1) Glovo: €100 blocked, final basket €120 — how can Monobank allow that?</h3>
+  <h3 data-lang="uk">1) Glovo: заблокували 100 €, фінал 120 € — як це може працювати з Monobank?</h3>
+  <p data-lang="en">On the card it often looks like <strong>€100 returned</strong> and then <strong>€120 charged</strong>. Technically that matches Monobank’s <strong>two-step model</strong>, not magic “increase the same hold”:</p>
+  <p data-lang="uk">На картці часто виглядає як <strong>повернення 100 €</strong> і потім <strong>списання 120 €</strong>. Технічно це вкладається в <strong>двокрокову модель</strong> Monobank, а не в «збільшити той самий hold»:</p>
+  <pre class="flow" data-lang="en">Checkout: HOLD €100 (estimate)
+After pick: invoice/cancel → hold released (customer sees +€100)
+Then: wallet/payment €120 with cardToken, initiationKind=merchant (+ agency split on €120)</pre>
+  <pre class="flow" data-lang="uk">Checkout: HOLD 100 € (estimate)
+Після збірки: invoice/cancel → hold знято (клієнт бачить +100 €)
+Далі: wallet/payment 120 € по cardToken, initiationKind=merchant (+ agency split на 120 €)</pre>
+  <p data-lang="en"><strong>Still open with Payments / Monobank:</strong> does Glovo UA use the same Monobank agency product; MIT rules when the second amount is <strong>higher</strong>; success rate and 3DS; chargebacks. Bolt cannot copy Glovo UX without rides-style disclosure + consent (Legal).</p>
+  <p data-lang="uk"><strong>Ще питання до Payments / Monobank:</strong> чи Glovo UA на тому ж agency-продукті; правила MIT, коли друга сума <strong>вища</strong>; success rate і 3DS; chargeback. Bolt не може копіювати UX Glovo без rides-style disclosure + consent (Legal).</p>
+
+  <h3 data-lang="en">2) Raiffeisen Bank Aval — maybe they support what we need?</h3>
+  <h3 data-lang="uk">2) Райффайзен Банк Аваль — чи є потрібна функція?</h3>
+  <p data-lang="en">Possibly, but it is <strong>not a shortcut until Payments compares</strong>: two-phase / incremental auth on one authorization, marketplace split at grocery volume, fees, timeline vs extending Monobank. Slack thread should end with a <strong>written RFI</strong> to Aval if Monobank path stays blocked for Stores scale.</p>
+  <p data-lang="uk">Можливо, але це <strong>не короткий шлях, поки Payments не порівняє</strong>: двофазна / incremental auth на одній авторизації, marketplace split на обсязі grocery, комісії, timeline vs розширення Monobank. Тред у Slack має завершитись <strong>письмовим RFI</strong> до Аваля, якщо шлях Monobank для масштабу Stores лишається заблокованим.</p>
+
+  <h3 data-lang="en">3) Why can’t we do it like Ride Hailing?</h3>
+  <h3 data-lang="uk">3) Чому не можемо як у Ride Hailing?</h3>
+  <p data-lang="en">RH already has <strong>estimate → hold → final fare</strong> in the product and on <strong>its PSP setup</strong>. UA Food Stores on Monobank agency are a <strong>different integration</strong> (split receivers, Bolt as payee) and Stores <strong>do not implement</strong> hold → release → final charge end-to-end. Matching RH is the <strong>right target pattern</strong> for Legal and UX — but it requires Product + Payments + Monobank work, not copying a RH config.</p>
+  <p data-lang="uk">У RH уже є <strong>estimate → hold → фінальна ціна</strong> в продукті і на <strong>своєму PSP</strong>. UA Food Stores на Monobank agency — <strong>інша інтеграція</strong> (split receivers, Bolt як отримувач), а Stores <strong>не реалізують</strong> hold → release → final charge end-to-end. Вирівнятися з RH — <strong>правильний цільовий патерн</strong> для Legal і UX, але потрібна робота Product + Payments + Monobank, а не копіювання конфігу RH.</p>
+
+  <div class="card red">
+    <p data-lang="en"><strong>Bottom line for stakeholders:</strong> “Monobank doesn’t support final charge” = <em>no plug-and-play RH-style flow for all UA grocery on today’s Monobank agency + Stores stack</em>. The bank API can support hold/finalize/cancel+MIT for defined pilots; scaling it to VARUS/ATB/Fora with compliance UX is the gap.</p>
+    <p data-lang="uk"><strong>Нижня лінія для стейкхолдерів:</strong> «Monobank не підтримує фінальне списання» = <em>немає готового RH-style флоу для всього UA grocery на сьогоднішній Monobank agency + Stores stack</em>. API банку може hold/finalize/cancel+MIT для пілотів; масштабування на VARUS/ATB/Fora з compliance UX — ось розрив.</p>
+  </div>
+
+  <h2 id="mono-api" data-lang="en">Monobank: three amounts after picking (X vs Y)</h2>
+  <h2 id="mono-api" data-lang="uk">Monobank: три суми після збірки (X vs Y)</h2>
+  <div class="table-wrap">
+    <table data-lang="en">
+      <thead><tr><th>Case</th><th>Monobank (Bolt LIKI24/BOND doc)</th><th>Customer experience</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Y = hold</strong></td><td><code>invoice/finalize</code> for full hold; agency split</td><td>One settled amount</td></tr>
+        <tr><td><strong>Y &lt; hold</strong></td><td><code>finalize</code> for Y; rest auto-released</td><td>Lower final charge</td></tr>
+        <tr><td><strong>Y &gt; hold</strong></td><td><code>cancel</code> hold → <code>wallet/payment</code> full Y (MIT)</td><td>Often looks like refund + new charge</td></tr>
+      </tbody>
+    </table>
+    <table data-lang="uk">
+      <thead><tr><th>Випадок</th><th>Monobank (док Bolt LIKI24/BOND)</th><th>Досвід клієнта</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Y = hold</strong></td><td><code>invoice/finalize</code> на повний hold; agency split</td><td>Одна фінальна сума</td></tr>
+        <tr><td><strong>Y &lt; hold</strong></td><td><code>finalize</code> на Y; решта повертається</td><td>Менше фінальне списання</td></tr>
+        <tr><td><strong>Y &gt; hold</strong></td><td><code>cancel</code> hold → <code>wallet/payment</code> на всю Y (MIT)</td><td>Часто виглядає як повернення + нове списання</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p data-lang="en">Official docs: hold expires in <strong>9 days</strong> if not finalized (<a href="https://api.monobank.ua/docs/acquiring.html">Monobank acquiring</a>). No documented “incremental authorization” on an existing hold.</p>
+  <p data-lang="uk">Офіційна дока: hold згорає через <strong>9 днів</strong>, якщо не finalize (<a href="https://api.monobank.ua/docs/acquiring.html">Monobank acquiring</a>). Немає задокументованого «incremental authorization» на існуючий hold.</p>
+
+  <h2 id="rh" data-lang="en">Related links</h2>
   <h2 data-lang="uk">Пов’язані матеріали</h2>
   <ul>
     <li data-lang="en"><a href="https://yuliianikolaieva.github.io/ukraine-second-payment-business-case/">Second payment business case (EN/UA)</a></li>
     <li data-lang="uk"><a href="https://yuliianikolaieva.github.io/ukraine-second-payment-business-case/">Business case «друга транзакція» (EN/UA)</a></li>
     <li><a href="https://taxify.atlassian.net/servicedesk/customer/portal/47/LSS-64024">LSS-64024 (Legal)</a></li>
     <li><a href="https://monobank.ua/api-docs/acquiring/methods/split/post--api--merchant--invoice--create">Monobank split API</a></li>
-    <li><a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509">Slack thread</a> <span class="inline-lang" data-lang="en">(fill in bank quotes)</span><span class="inline-lang" data-lang="uk">(доповнити цитатами банку)</span></li>
+    <li><a href="https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509">Slack thread</a></li>
+    <li data-lang="en">Internal: <code>Bolt &amp; Mono/bolt-mono-flow</code> (agency scenarios)</li>
+    <li data-lang="uk">Internal: <code>Bolt &amp; Mono/bolt-mono-flow</code> (сценарії agency)</li>
   </ul>
 
-  <h2 data-lang="en">TL;DR</h2>
+  <h2 data-lang="en">TL;DR (detail)</h2>
   <h2 data-lang="uk">Коротко</h2>
   <p data-lang="en">After picking, the partner act <strong>Y</strong> often exceeds what the eater paid at checkout <strong>X</strong> (substitutions, weight, packaging). UA market practice (incl. Glovo) is to <strong>charge the final basket after picking</strong>. Bolt Stores today charges <strong>once before picking</strong>; Bolt funds Y−X.</p>
   <p data-lang="uk">Після збірки акт партнера <strong>Y</strong> часто вищий за те, що eater сплатив на checkout <strong>X</strong> (заміни, вага, пакування). Ринковий стандарт UA (зокрема Glovo) — <strong>списати фінальний кошик після picking</strong>. Bolt Stores зараз списує <strong>один раз до збірки</strong>; Bolt закриває Y−X.</p>
@@ -275,17 +377,17 @@
     <li data-lang="uk"><strong>Опційно:</strong> RFI до Райффайзен Аваль — owner і deadline від Finance/Payments.</li>
   </ol>
 
-  <h2 data-lang="en">8 · To add from Slack</h2>
-  <h2 data-lang="uk">8 · Доповнити з Slack</h2>
+  <h2 data-lang="en">8 · Paste verbatim quotes from Slack (optional)</h2>
+  <h2 data-lang="uk">8 · Дослівні цитати з Slack (за потреби)</h2>
+  <p data-lang="en">If Payments or Monobank gave exact wording in the thread, paste it below in the next doc revision so stakeholders see primary sources — the analysis in §0 is already aligned with <code>bolt-mono-flow</code> and Monobank API docs.</p>
+  <p data-lang="uk">Якщо у треді є точні формулювання від Payments або Monobank — встав їх у наступну версію документа; аналіз у §0 уже узгоджений з <code>bolt-mono-flow</code> і API Monobank.</p>
   <ul class="checklist">
-    <li data-lang="en">Exact Monobank quotes (what they “do not support”)</li>
-    <li data-lang="uk">Точні цитати Monobank (що «не підтримують»)</li>
-    <li data-lang="en">Bank contact name and role</li>
-    <li data-lang="uk">Контакт у банку: ім’я та роль</li>
-    <li data-lang="en">Agreements / timeline</li>
-    <li data-lang="uk">Домовленості / timeline</li>
-    <li data-lang="en">Bolt-side blockers named separately from the bank</li>
-    <li data-lang="uk">Блокери з боку Bolt окремо від банку</li>
+    <li data-lang="en">Payments: one-sentence “why not RH tomorrow”</li>
+    <li data-lang="uk">Payments: одне речення «чому не RH завтра»</li>
+    <li data-lang="en">Monobank: written position on MIT top-up + agency split at grocery scale</li>
+    <li data-lang="uk">Monobank: письмова позиція по MIT top-up + agency split на масштабі grocery</li>
+    <li data-lang="en">Owner + date for Aval RFI (if any)</li>
+    <li data-lang="uk">Owner + дата RFI до Аваля (якщо є)</li>
   </ul>
 
   <footer>
@@ -303,7 +405,7 @@
     document.documentElement.lang = lang === 'uk' ? 'uk' : 'en';
     localStorage.setItem('monobankDocLanguage', lang);
   }
-  setLanguage(localStorage.getItem('monobankDocLanguage') || 'en');
+  setLanguage(localStorage.getItem('monobankDocLanguage') || 'uk');
 </script>
 </body>
 </html>

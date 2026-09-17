@@ -3,7 +3,7 @@
 **Read the document (EN / UA):** https://yuliianikolaieva.github.io/ua-monobank-stores-payment-gap/  
 **GitHub:** https://github.com/yuliianikolaieva/ua-monobank-stores-payment-gap
 
-Bilingual working doc for Payments, Product, and Monobank: what we need, API limits, Ride Hailing comparison, and open questions (Glovo, Raiffeisen Aval).
+Bilingual **explainer** for the [Slack thread](https://taxify.slack.com/archives/C0BD2EQR4LW/p1788978109541509): what “Monobank doesn’t support it” means in practice, Glovo €100→€120 vs Monobank API, Raiffeisen Aval, and why not Ride Hailing today.
 
 | | |
 |--|--|
